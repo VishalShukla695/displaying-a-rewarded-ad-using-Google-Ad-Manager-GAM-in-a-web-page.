@@ -1,0 +1,1 @@
+# displaying-a-rewarded-ad-using-Google-Ad-Manager-GAM-in-a-web-page.
