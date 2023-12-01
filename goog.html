@@ -1,0 +1,225 @@
+
+<!doctype html>
+<!--
+ @license
+ Copyright 2022 Google LLC. All Rights Reserved.
+ SPDX-License-Identifier: Apache-2.0
+-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Display a GPT-managed rewarded ad." />
+    <title>Display a rewarded ad</title>
+    <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+    <script>
+      window.googletag = window.googletag || { cmd: [] };
+
+      let rewardedSlot;
+function start(url)
+{
+
+      googletag.cmd.push(() => {
+        rewardedSlot = googletag.defineOutOfPageSlot(
+          "/22639388115/rewarded_web_example",
+          googletag.enums.OutOfPageFormat.REWARDED,
+        );
+
+        // Slot returns null if the page or device does not support rewarded ads.
+        if (rewardedSlot) {
+      rewardedSlot.addService(googletag.pubads());
+
+timer=0;
+          googletag.pubads().addEventListener("rewardedSlotReady", (event) => {
+timer=1;
+            document.getElementById("watchAdButton").onclick = () => {
+              event.makeRewardedVisible();
+              displayModal();
+            };
+
+            displayModal("reward", "Watch an ad to get access to this article?");
+          });
+
+setTimeout(function() {
+if(timer==0)
+window.location.href=url;    
+//console.log('Delayed message');
+}, 500);          
+
+googletag.pubads().addEventListener("rewardedSlotClosed", dismissRewardedAd);
+
+          googletag.pubads().addEventListener("rewardedSlotGranted", (event) => {
+            // Automatically close the ad by destroying the slot.
+            // Remove this to force the user to close the ad themselves.
+//alert("HERE AGAIN");
+            dismissRewardedAd();
+
+            const reward = event.payload;
+            if (reward) {
+dismissRewardedAd();
+window.location.href=url;
+
+            }
+          });
+
+          googletag.enableServices();
+          googletag.display(rewardedSlot);
+        }
+      });
+}
+      function dismissRewardedAd() {
+        displayModal();
+
+        if (rewardedSlot) {
+        googletag.destroySlots([rewardedSlot]);
+        }
+      }
+
+      function displayModal(type = "", message = "",url ="") {
+        const modal = document.getElementById("modal");
+        modal.removeAttribute("data-type");
+
+        if (type) {
+          document.getElementById("modalMessage").textContent = message;
+          modal.setAttribute("data-type", type);
+        }
+      }
+    </script>
+    <style>
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        padding-top: 300px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal[data-type] {
+        display: block;
+      }
+
+      .modalDialog {
+        margin: auto;
+        padding: 25px;
+        background-color: white;
+        text-align: center;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .grantButtons,
+      .rewardButtons {
+        display: none;
+      }
+
+      .modal[data-type="grant"] .grantButtons,
+      .modal[data-type="reward"] .rewardButtons {
+        display: block;
+      }
+
+      .modal input[type="button"] {
+        padding: 0.5rem;
+        background: blue;
+        border: none;
+        border-radius: 4px;
+        margin: 4px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="modal" class="modal">
+      <div class="modalDialog">
+        <p id="modalMessage"></p>
+
+        <span class="grantButtons">
+          <input id="closeButton" type="button" value="Close" />
+        </span>
+
+        <span class="rewardButtons">
+          <input type="button" id="watchAdButton" value="Yes" />
+          <input id="noRewardButton" type="button" value="No" />
+        </span>
+      </div>
+    </div>
+    <script>
+      googletag.cmd.push(function () {
+        // Register click event handlers.
+        document.getElementById("closeButton").addEventListener("click", dismissRewardedAd);
+        document.getElementById("noRewardButton").addEventListener("click", dismissRewardedAd);
+      });
+    </script>
+
+<a class='abm' href='http://www.google.com?q=article'>test </a><br>
+
+<script>
+
+// Function to check if the user has visited more than 5 times in a day
+function checkVisitCount() {
+    // Get the current date
+    var currentDate = new Date().toLocaleDateString();
+
+    // Retrieve visit count from localStorage
+    var visitCount = localStorage.getItem('visitCount');
+    var lastVisitDate = localStorage.getItem('lastVisitDate');
+
+    // If there's no stored date or the stored date is not the current date, reset the count
+    if (!lastVisitDate || lastVisitDate !== currentDate) {
+        visitCount = 0;
+    }
+
+    // Increment the visit count
+    visitCount = parseInt(visitCount) + 1;
+
+    // Update the localStorage with the new values
+    localStorage.setItem('visitCount', visitCount);
+    localStorage.setItem('lastVisitDate', currentDate);
+
+}
+
+// Call the function when the page loads article page onlu
+threshold=0;
+visitcount=localStorage.getItem('visitCount');
+if(visitcount==undefined)
+visitcount=0;
+
+//load this only when article pages is loaded
+if (window.location.href.includes("article")) 
+checkVisitCount();
+
+if(visitcount>=threshold)
+{
+
+
+var articleLinks = document.querySelectorAll('a[href*="article"]');
+
+articleLinks.forEach(function(link) {
+var elements = document.querySelectorAll('.abm');
+
+
+    // Add click event listener to each element
+    elements.forEach(function (element) {
+        element.addEventListener('click', function (event) {
+            // Prevent the default behavior of the link (e.g., navigating to a new page)
+            event.preventDefault();
+
+            // Your custom logic here
+start(element.href);
+            // For example, you can log a message to the console
+            console.log('Link clicked with class "abm":', element.href);
+        });
+    });
+ console.log(link.href);
+});
+}
+</script>
+
+  </body>
+</html>
+
